@@ -75,222 +75,43 @@ def home():
 # CHAT ROUTE
 # =========================================
 
-# =========================================
-# CHAT ROUTE WITH MEMORY
-# =========================================
+@app.get("/chat")
 
-@app.post("/chat")
-
-async def chat(request: Request):
+def chat(prompt: str):
 
     try:
 
-        # =========================================
-        # REQUEST DATA
-        # =========================================
-
-        data = await request.json()
-
-        message = data.get(
-            "message",
-            ""
-        )
-
-        history = data.get(
-            "history",
-            []
-        )
-
-        settings = data.get(
-            "settings",
-            {}
-        )
-
-        # =========================================
-        # MODEL SELECTION
-        # =========================================
-
-        selected_model = settings.get(
-
-            "model",
-
-            "gpt-3.5"
-        )
-
-        model_map = {
-
-            "gpt-3.5":
-            "openai/gpt-3.5-turbo",
-
-            "gpt-4o-mini":
-            "openai/gpt-4o-mini",
-
-            "gpt-4o":
-            "openai/gpt-4o"
-        }
-
-        model_name = model_map.get(
-
-            selected_model,
-
-            "openai/gpt-3.5-turbo"
-        )
-
-        # =========================================
-        # RESPONSE STYLE
-        # =========================================
-
-        response_style = settings.get(
-
-            "responseStyle",
-
-            "balanced"
-        )
-
-        temperature_map = {
-
-            "creative": 0.9,
-
-            "balanced": 0.7,
-
-            "professional": 0.5,
-
-            "concise": 0.3
-        }
-
-        temperature = temperature_map.get(
-
-            response_style,
-
-            0.7
-        )
-
-        # =========================================
-        # SYSTEM PROMPT
-        # =========================================
-
-        system_prompt = """
-
-        You are ASnova AI,
-        an advanced AI study assistant.
-
-        Behave like ChatGPT.
-
-        Remember previous messages.
-
-        Continue conversations naturally.
-
-        Understand context deeply.
-
-        Give detailed,
-        intelligent,
-        contextual,
-        structured responses.
-
-        Explain concepts step-by-step.
-
-        Help students learn easily.
-
-        Use:
-        - headings
-        - bullet points
-        - examples
-        - structured formatting
-
-        When user says:
-        - continue
-        - next
-        - explain more
-        - continue above
-        - elaborate
-
-        continue previous discussion naturally.
-
-        """
-
-        # =========================================
-        # MESSAGE ARRAY
-        # =========================================
-
-        messages = [
-
-            {
-                "role": "system",
-
-                "content":
-                system_prompt
-            }
-
-        ]
-
-        # =========================================
-        # ADD HISTORY
-        # =========================================
-
-        for item in history:
-
-            if (
-
-                isinstance(item, dict)
-
-                and
-
-                item.get("role")
-
-                and
-
-                item.get("content")
-            ):
-
-                messages.append({
-
-                    "role":
-                    item["role"],
-
-                    "content":
-                    item["content"]
-                })
-
-        # =========================================
-        # ADD CURRENT MESSAGE
-        # =========================================
-
-        if (
-
-            len(messages) == 1
-
-            or
-
-            messages[-1]["role"] != "user"
-
-            or
-
-            messages[-1]["content"] != message
-        ):
-
-            messages.append({
-
-                "role": "user",
-
-                "content": message
-            })
-
-        # =========================================
-        # OPENROUTER REQUEST
-        # =========================================
-
         response = client.chat.completions.create(
 
-            model=model_name,
+            model=
+            "openai/gpt-3.5-turbo",
 
-            messages=messages,
+            messages=[
 
-            temperature=temperature
+                {
+                    "role": "system",
+
+                    "content":
+                    """
+                    You are ASnova AI,
+                    a smart AI study assistant.
+
+                    Always:
+                    - explain clearly
+                    - use points
+                    - keep answers structured
+                    - help students learn easily
+                    """
+                },
+
+                {
+                    "role": "user",
+
+                    "content": prompt
+                }
+
+            ]
         )
-
-        # =========================================
-        # FINAL RESPONSE
-        # =========================================
 
         return {
 
@@ -304,7 +125,8 @@ async def chat(request: Request):
         return {
 
             "error": str(e)
-            }
+        }
+
 # =========================================
 # PDF SUMMARY
 # =========================================
