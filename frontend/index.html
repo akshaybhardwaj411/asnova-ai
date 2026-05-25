@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>ASnova AI</title>
+
+    <!-- FONT -->
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- CSS -->
+
+    <link
+        rel="stylesheet"
+        href="css/style.css">
+
+    <!-- CHART -->
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- MARKDOWN -->
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <!-- HIGHLIGHT -->
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+
+</head>
+
+<body id="body">
+
+    <!-- IMAGE MODAL -->
+
+    <div
+        class="image-modal"
+        id="imageModal">
+
+        <button
+            class="close-image-btn"
+            onclick="closeImageModal()">
+
+            ✕
+
+        </button>
+
+        <img id="modalImage">
+
+    </div>
+
+    <!-- DRAG OVERLAY -->
+
+    <div
+        class="drag-overlay"
+        id="dragOverlay">
+
+        <div class="drag-box">
+
+            📂 Drop files or images here
+
+        </div>
+
+    </div>
+
+    <!-- SIDEBAR -->
+
+    <div
+        class="sidebar"
+        id="sidebar">
+
+        <!-- LOGO -->
+
+        <div class="logo">
+
+            ✨ ASnova
+
+        </div>
+
+        <!-- NEW CHAT -->
+
+        <button
+            class="new-chat-btn"
+            onclick="newChat()">
+
+            ➕ New Chat
+
+        </button>
+
+        <!-- HISTORY -->
+
+        <div class="history-section">
+
+            <h3>
+
+                Recent Chats
+
+            </h3>
+
+        </div>
+
+        <!-- SIDEBAR BOTTOM -->
+
+        <div class="sidebar-bottom">
+
+            <button
+                onclick="openSearchModal()">
+
+                🔍 Search
+
+            </button>
+
+            <button
+                onclick="openSettingsModal()">
+
+                ⚙ Settings
+
+            </button>
+
+            <button
+                onclick="toggleTheme()">
+
+                🌙 Theme
+
+            </button>
+
+            <button
+                onclick="toggleVoice()"
+                id="voiceToggleBtn">
+
+                🔊 Voice
+
+            </button>
+
+            <button
+                onclick="clearChats()">
+
+                🗑 Clear
+
+            </button>
+
+        </div>
+
+    </div>
+
+    <!-- MAIN -->
+
+    <div class="main">
+
+        <!-- TOPBAR -->
+
+        <div class="topbar">
+
+            <!-- MOBILE MENU -->
+
+            <button
+                class="mobile-menu"
+                onclick="toggleSidebar()">
+
+                ☰
+
+            </button>
+
+            <!-- TITLE -->
+
+            <div class="topbar-title">
+
+                ASnova AI Workspace
+
+            </div>
+
+        </div>
+
+        <!-- CHAT CONTAINER -->
+
+        <div class="chat-container">
+
+            <!-- WELCOME -->
+
+            <div
+                class="welcome-screen"
+                id="welcomeScreen">
+
+                <h1>
+
+                    How can I help you today?
+
+                </h1>
+
+                <p>
+
+                    AI Study Assistant • Notes • PYQs • Flashcards • Productivity
+
+                </p>
+
+                <!-- PROMPTS -->
+
+                <div class="prompt-cards">
+
+                    <div
+                        class="prompt-card"
+                        onclick="usePrompt('Explain Operating System scheduling algorithms')">
+
+                        ⚙ Explain OS Scheduling
+
+                    </div>
+
+                    <div
+                        class="prompt-card"
+                        onclick="usePrompt('Generate important DBMS PYQs')">
+
+                        🧠 Generate PYQs
+
+                    </div>
+
+                    <div
+                        class="prompt-card"
+                        onclick="usePrompt('Summarize my uploaded PDF notes')">
+
+                        📄 Summarize Notes
+
+                    </div>
+
+                    <div
+                        class="prompt-card"
+                        onclick="usePrompt('Create a 30-day DSA roadmap')">
+
+                        🚀 Study Roadmap
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- CHAT -->
+
+            <div
+                class="chat-box"
+                id="chatBox">
+
+            </div>
+
+        </div>
+
+        <!-- FLOATING INPUT -->
+
+        <div class="floating-input-wrapper">
+
+            <!-- PREVIEW -->
+
+            <div
+                class="upload-preview"
+                id="uploadPreview">
+
+            </div>
+
+            <!-- INPUT AREA -->
+
+            <div class="floating-input-area">
+
+                <!-- TOOLS -->
+
+                <button
+                    class="tool-btn"
+                    onclick="toggleToolsMenu()">
+
+                    ➕
+
+                </button>
+
+                <!-- TOOLS MENU -->
+
+                <div
+                    class="tools-menu"
+                    id="toolsMenu">
+
+                    <!-- PDF -->
+
+                    <label for="pdfFile">
+
+                        📄 Upload PDF
+
+                    </label>
+
+                    <!-- IMAGE -->
+
+                    <label for="imageFile">
+
+                        🖼 Upload Image
+
+                    </label>
+
+                    <!-- IMAGE ANALYSIS -->
+
+                    <button
+                        onclick="analyzeImage()">
+
+                        👁 Analyze Image
+
+                    </button>
+
+                    <!-- PDF SUMMARY -->
+
+                    <button
+                        onclick="summarizePDF()">
+
+                        📄 Summarize PDF
+
+                    </button>
+
+                    <!-- QUIZ -->
+
+                    <button
+                        onclick="generateQuiz()">
+
+                        🧠 Generate Quiz
+
+                    </button>
+
+                    <!-- FLASHCARDS -->
+
+                    <button
+                        onclick="generateFlashcards()">
+
+                        🎴 Flashcards
+
+                    </button>
+
+                    <!-- PYQ -->
+
+                    <button
+                        onclick="generatePYQ()">
+
+                        📚 Generate PYQ
+
+                    </button>
+
+                    <!-- MUSIC -->
+
+                    <button
+                        onclick="playMusic()">
+
+                        🎵 Music
+
+                    </button>
+
+                </div>
+
+                <!-- PDF INPUT -->
+
+                <input
+                    type="file"
+                    id="pdfFile"
+                    accept=".pdf"
+                    hidden>
+
+                <!-- IMAGE INPUT -->
+
+                <input
+                    type="file"
+                    id="imageFile"
+                    accept="image/*"
+                    hidden>
+
+                <!-- MIC -->
+
+                <button
+                    class="tool-btn"
+                    onclick="startListening()">
+
+                    🎤
+
+                </button>
+
+                <!-- TEXT INPUT -->
+
+                <input
+                    type="text"
+                    id="prompt"
+                    placeholder="Message ASnova...">
+
+                <!-- SEND -->
+
+                <button
+                    class="send-btn"
+                    onclick="askAI()">
+
+                    ➤
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- MUSIC PLAYER -->
+
+    <div id="musicPlayer"></div>
+
+    <!-- SCRIPTS -->
+
+<script src="js/config.js"></script>
+
+<script src="js/chat.js"></script>
+
+<script src="js/pdf.js"></script>
+
+<script src="js/quiz.js"></script>
+
+<script src="js/flashcards.js"></script>
+
+<script src="js/voice.js"></script>
+
+<script src="js/theme.js"></script>
+
+<script src="js/search.js"></script>
+
+<script src="js/settings.js"></script>
+
+<script src="js/music.js"></script>
+
+<script src="js/pyq.js"></script>
+
+<script src="js/responsive.js"></script>
+</body>
+
+</html>
