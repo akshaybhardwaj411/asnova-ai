@@ -11,7 +11,7 @@ const LOCAL_API =
 // CHANGE LATER
 
 const LIVE_API =
-    "https://your-backend-url.onrender.com";
+    "https://asnova-backend.onrender.com";
 
 // AUTO DETECT
 
