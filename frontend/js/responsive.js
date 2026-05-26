@@ -1,88 +1,51 @@
+// ========================================
+// SIDEBAR TOGGLE
+// ========================================
+
+const menuBtn =
+    document.getElementById("menuBtn");
+
+const sidebar =
+    document.getElementById("sidebar");
+
 // TOGGLE SIDEBAR
 
-function toggleSidebar() {
+menuBtn.addEventListener("click", () => {
 
-    document
-        .getElementById(
-            "sidebar"
-        )
-        .classList
-        .toggle("active");
-}
+    sidebar.classList.toggle("active");
+});
 
-// AUTO CLOSE SIDEBAR
-// AFTER CLICKING BUTTONS
+// CLOSE WHEN CLICKING OUTSIDE
 
-document.addEventListener(
+document.addEventListener("click", (e) => {
 
-    "click",
+    const clickedInsideSidebar =
+        sidebar.contains(e.target);
 
-    function(event) {
+    const clickedMenu =
+        menuBtn.contains(e.target);
 
-        let sidebar =
-            document.getElementById(
-                "sidebar"
-            );
+    if (
+        !clickedInsideSidebar &&
+        !clickedMenu
+    ) {
 
-        let menuButton =
-            document.querySelector(
-                ".menu-toggle"
-            );
+        sidebar.classList.remove("active");
+    }
+});
 
-        // MOBILE ONLY
+// CLOSE AFTER CLICKING SIDEBAR BUTTON
 
-        if (
+const sidebarButtons =
+    sidebar.querySelectorAll("button");
 
-            window.innerWidth <= 900 &&
+sidebarButtons.forEach((btn) => {
 
-            !sidebar.contains(
-                event.target
-            ) &&
+    btn.addEventListener("click", () => {
 
-            !menuButton.contains(
-                event.target
-            )
+        if (window.innerWidth < 900) {
 
-        ) {
-
-            sidebar.classList.remove(
-                "active"
-            );
+            sidebar.classList.remove("active");
         }
-    }
-);
-
-// CLOSE SIDEBAR
-// AFTER CLICKING SIDEBAR BUTTON
-
-let sidebarButtons =
-    document.querySelectorAll(
-
-        ".sidebar button"
-    );
-
-sidebarButtons.forEach(
-
-    button => {
-
-        button.addEventListener(
-
-            "click",
-
-            () => {
-
-                if (
-                    window.innerWidth <= 900
-                ) {
-
-                    document
-                        .getElementById(
-                            "sidebar"
-                        )
-                        .classList
-                        .remove("active");
-                }
-            }
-        );
-    }
-);
+    });
+});
