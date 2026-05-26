@@ -3284,3 +3284,53 @@ body.light-mode .spinner {
         font-size: 13px;
     }
 }
+
+
+/* ========================================
+   CLOSE SIDEBAR BUTTON
+======================================== */
+
+.close-sidebar {
+
+    position: absolute;
+
+    top: 15px;
+
+    right: 15px;
+
+    width: 40px;
+
+    height: 40px;
+
+    border-radius: 50%;
+
+    border: none;
+
+    background: #ef4444;
+
+    color: white;
+
+    font-size: 22px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+    z-index: 3000;
+
+    display: none;
+}
+
+/* MOBILE ONLY */
+
+@media screen and (max-width: 900px) {
+
+    .close-sidebar {
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: center;
+    }
+}
