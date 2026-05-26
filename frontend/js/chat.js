@@ -22,12 +22,12 @@ window.onload = function () {
         )
         .addEventListener(
 
-            "keypress",
+            "keydown",
 
-            function(event) {
+            function (e) {
 
                 if (
-                    event.key === "Enter"
+                    e.key === "Enter"
                 ) {
 
                     askAI();
@@ -44,7 +44,7 @@ function loadChats() {
 
     let saved =
         localStorage.getItem(
-            "asnova_all_chats"
+            "asnova_chats"
         );
 
     if (saved) {
@@ -53,15 +53,6 @@ function loadChats() {
             JSON.parse(saved);
 
         renderHistory();
-
-        if (
-            allChats.length > 0
-        ) {
-
-            openChat(
-                allChats[0].id
-            );
-        }
     }
 }
 
@@ -73,7 +64,7 @@ function saveAllChats() {
 
     localStorage.setItem(
 
-        "asnova_all_chats",
+        "asnova_chats",
 
         JSON.stringify(allChats)
     );
@@ -85,12 +76,12 @@ function saveAllChats() {
 
 function newChat() {
 
-    currentChatId =
+    let id =
         Date.now();
 
     let chat = {
 
-        id: currentChatId,
+        id: id,
 
         title: "New Chat",
 
@@ -98,6 +89,8 @@ function newChat() {
     };
 
     allChats.unshift(chat);
+
+    currentChatId = id;
 
     saveAllChats();
 
@@ -120,18 +113,11 @@ function newChat() {
 function renderHistory() {
 
     let history =
-        document.querySelector(
-            ".history-section"
+        document.getElementById(
+            "historyList"
         );
 
-    history.innerHTML =
-        `
-        <h3>
-
-            Recent Chats
-
-        </h3>
-        `;
+    history.innerHTML = "";
 
     allChats.forEach(chat => {
 
@@ -141,51 +127,34 @@ function renderHistory() {
             );
 
         item.className =
-            "history-chat";
-
-        // ACTIVE
-
-        if (
-            chat.id === currentChatId
-        ) {
-
-            item.classList.add(
-                "active-chat"
-            );
-        }
+            "history-item";
 
         item.innerHTML =
             `
-            <div
-                class="history-title"
-                onclick="openChat(${chat.id})">
+            <span onclick="openChat(${chat.id})">
 
                 ${chat.title}
 
-            </div>
+            </span>
 
             <div class="history-actions">
 
-                <button
-                    onclick="renameChat(${chat.id})">
+                <button onclick="renameChat(${chat.id})">
 
                     ✏️
 
                 </button>
 
-                <button
-                    onclick="deleteChat(${chat.id})">
+                <button onclick="deleteChat(${chat.id})">
 
-                    🗑
+                    🗑️
 
                 </button>
 
             </div>
             `;
 
-        history.appendChild(
-            item
-        );
+        history.appendChild(item);
     });
 }
 
@@ -210,27 +179,10 @@ function openChat(id) {
     ).innerHTML =
         chat.messages.join("");
 
-    // WELCOME
-
-    if (
-        chat.messages.length > 0
-    ) {
-
-        document.getElementById(
-            "welcomeScreen"
-        ).style.display =
-            "none";
-    }
-
-    else {
-
-        document.getElementById(
-            "welcomeScreen"
-        ).style.display =
-            "block";
-    }
-
-    renderHistory();
+    document.getElementById(
+        "welcomeScreen"
+    ).style.display =
+        "none";
 
     scrollBottom();
 }
@@ -487,7 +439,7 @@ function createAIMessage() {
 
                 <div class="thinking-text">
 
-                    ASnova is thinking...
+                    ASnova is thinking.
 
                 </div>
 
@@ -692,34 +644,34 @@ async function askAI() {
 
     catch(error) {
 
-    let message =
-        `
-        <div class="error-box">
+        let message =
+            `
+            <div class="error-box">
 
-            ❌ Unable to connect to ASnova AI.
+                ❌ Unable to connect to ASnova AI.
 
-            <br><br>
+                <br><br>
 
-            Please check:
+                Please check:
 
-            <ul>
+                <ul>
 
-                <li>Backend server is running</li>
+                    <li>Backend server is running</li>
 
-                <li>Internet connection</li>
+                    <li>Internet connection</li>
 
-                <li>API quota availability</li>
+                    <li>API quota availability</li>
 
-            </ul>
+                </ul>
 
-        </div>
-        `;
+            </div>
+            `;
 
-    aiMessage.querySelector(
-        ".message.ai"
-    ).innerHTML =
-        message;
-}
+        aiMessage.querySelector(
+            ".message.ai"
+        ).innerHTML =
+            message;
+    }
 }
 
 // ========================================
@@ -729,16 +681,16 @@ async function askAI() {
 async function editMessage(button) {
 
     let userMessage =
-        button.parentElement;
+        button.parentElement.querySelector(
+            ".user-text"
+        );
 
     let oldText =
-        userMessage.querySelector(
-            ".user-text"
-        ).innerText;
+        userMessage.innerText;
 
     let newText =
         prompt(
-            "Edit your message:",
+            "Edit message:",
             oldText
         );
 
@@ -750,202 +702,44 @@ async function editMessage(button) {
         return;
     }
 
-    userMessage.querySelector(
-        ".user-text"
-    ).innerText =
+    userMessage.innerText =
         newText;
 
-    let wrapper =
-        userMessage.parentElement;
-
-    let aiWrapper =
-        wrapper.nextElementSibling;
-
-    if (
-        aiWrapper &&
-        aiWrapper.classList.contains(
-            "ai-wrapper"
-        )
-    ) {
-
-        let aiMessage =
-            aiWrapper.querySelector(
-                ".message.ai"
-            );
-
-        aiMessage.innerHTML =
-            `
-            <span class="typing-cursor">
-
-                ●
-
-            </span>
-            `;
-
-        try {
-
-            let response =
-                await fetch(
-
-                    `${API_BASE_URL}/chat?prompt=${encodeURIComponent(newText)}`
-                );
-
-            let data =
-                await response.json();
-
-            let aiText =
-                data.response ||
-                data.error;
-
-            streamResponse(
-                aiWrapper,
-                aiText
-            );
-        }
-
-        catch {
-
-            aiMessage.innerHTML =
-                `
-                Error regenerating response.
-                `;
-        }
-    }
+    updateCurrentChat();
 }
 
 // ========================================
-// TOOLS MENU
+// PIN NOTE
 // ========================================
 
-function toggleToolsMenu() {
+function pinNote(button) {
 
-    document
-        .getElementById(
-            "toolsMenu"
-        )
-        .classList
-        .toggle(
-            "active"
+    let text =
+        button.parentElement.innerText;
+
+    let pinnedArea =
+        document.getElementById(
+            "pinnedNotes"
         );
-}
 
-// ========================================
-// MOBILE SIDEBAR
-// ========================================
-
-function toggleSidebar() {
-
-    document
-        .getElementById(
-            "sidebar"
-        )
-        .classList
-        .toggle(
-            "active"
+    let note =
+        document.createElement(
+            "div"
         );
-}
 
-// ========================================
-// PROMPTS
-// ========================================
+    note.className =
+        "pinned-text";
 
-function usePrompt(text) {
+    note.innerHTML =
+        `
+        📌 ${text}
+        `;
 
-    document.getElementById(
-        "welcomeScreen"
-    ).style.display =
-        "none";
-
-    document.getElementById(
-        "prompt"
-    ).value =
-        text;
-
-    askAI();
-}
-
-// ========================================
-// PDF PREVIEW
-// ========================================
-
-document
-    .getElementById(
-        "pdfFile"
-    )
-    .addEventListener(
-
-        "change",
-
-        function(event) {
-
-            let file =
-                event.target.files[0];
-
-            if (!file) return;
-
-            let preview =
-                document.getElementById(
-                    "uploadPreview"
-                );
-
-            preview.innerHTML =
-                `
-                <div class="file-chip">
-
-                    📄 ${file.name}
-
-                    <button
-                        onclick="removeUploadedFile()">
-
-                        ✕
-
-                    </button>
-
-                </div>
-                `;
-        }
-    );
-
-// ========================================
-// REMOVE PDF
-// ========================================
-
-function removeUploadedFile() {
-
-    document.getElementById(
-        "pdfFile"
-    ).value = "";
-
-    document.getElementById(
-        "uploadPreview"
-    ).innerHTML = "";
+    pinnedArea.appendChild(note);
 }
 
 // ========================================
 // IMAGE PREVIEW
-// ========================================
-
-document
-    .getElementById(
-        "imageFile"
-    )
-    .addEventListener(
-
-        "change",
-
-        function(event) {
-
-            let file =
-                event.target.files[0];
-
-            if (!file) return;
-
-            showImagePreview(file);
-        }
-    );
-
-// ========================================
-// SHOW IMAGE PREVIEW
 // ========================================
 
 function showImagePreview(file) {
@@ -956,12 +750,9 @@ function showImagePreview(file) {
     reader.onload =
         function(e) {
 
-            let preview =
-                document.getElementById(
-                    "uploadPreview"
-                );
-
-            preview.innerHTML =
+            document.getElementById(
+                "uploadPreview"
+            ).innerHTML =
                 `
                 <div class="image-chip">
 
@@ -1058,273 +849,6 @@ document.addEventListener(
         ) {
 
             closeImageModal();
-        }
-    }
-);
-
-// ========================================
-// DRAG & DROP
-// ========================================
-
-const dragOverlay =
-    document.getElementById(
-        "dragOverlay"
-    );
-
-document.addEventListener(
-
-    "dragenter",
-
-    function(event) {
-
-        event.preventDefault();
-
-        dragOverlay.classList.add(
-            "active"
-        );
-    }
-);
-
-document.addEventListener(
-
-    "dragover",
-
-    function(event) {
-
-        event.preventDefault();
-    }
-);
-
-document.addEventListener(
-
-    "dragleave",
-
-    function(event) {
-
-        if (
-            event.clientX === 0 ||
-            event.clientY === 0
-        ) {
-
-            dragOverlay.classList.remove(
-                "active"
-            );
-        }
-    }
-);
-
-document.addEventListener(
-
-    "drop",
-
-    function(event) {
-
-        event.preventDefault();
-
-        dragOverlay.classList.remove(
-            "active"
-        );
-
-        let file =
-            event.dataTransfer.files[0];
-
-        if (!file) return;
-
-        // IMAGE
-
-        if (
-            file.type.startsWith(
-                "image/"
-            )
-        ) {
-
-            const dt =
-                new DataTransfer();
-
-            dt.items.add(file);
-
-            document.getElementById(
-                "imageFile"
-            ).files =
-                dt.files;
-
-            showImagePreview(file);
-        }
-
-        // PDF
-
-        else {
-
-            const dt =
-                new DataTransfer();
-
-            dt.items.add(file);
-
-            document.getElementById(
-                "pdfFile"
-            ).files =
-                dt.files;
-
-            let preview =
-                document.getElementById(
-                    "uploadPreview"
-                );
-
-            preview.innerHTML =
-                `
-                <div class="file-chip">
-
-                    📄 ${file.name}
-
-                    <button
-                        onclick="removeUploadedFile()">
-
-                        ✕
-
-                    </button>
-
-                </div>
-                `;
-        }
-    }
-);
-
-// ========================================
-// AI IMAGE ANALYSIS
-// ========================================
-
-
-            // AI MESSAGE
-
-            let aiWrapper =
-                createAIMessage();
-
-            chatBox.appendChild(
-                aiWrapper
-            );
-
-            scrollBottom();
-
-            // FORM DATA
-
-            let formData =
-                new FormData();
-
-            formData.append(
-                "file",
-                file
-            );
-
-            try {
-
-                let response =
-                    await fetch(
-
-                        `${API_BASE_URL}/analyze-image`,
-
-                        {
-                            method: "POST",
-
-                            body: formData
-                        }
-                    );
-
-                let data =
-                    await response.json();
-
-                let aiText =
-                    data.response ||
-                    data.error;
-
-                streamResponse(
-                    aiWrapper,
-                    aiText
-                );
-            }
-
-            catch(error) {
-
-    let message =
-        `
-        <div class="error-box">
-
-            ❌ Image analysis failed.
-
-            <br><br>
-
-            Possible reasons:
-
-            <ul>
-
-                <li>Unsupported image</li>
-
-                <li>Large image size</li>
-
-                <li>Backend offline</li>
-
-                <li>API limit reached</li>
-
-            </ul>
-
-        </div>
-        `;
-
-    aiWrapper.querySelector(
-        ".message.ai"
-    ).innerHTML =
-        message;
-}
-        };
-
-    reader.readAsDataURL(file);
-}
-
-// ========================================
-// NETWORK STATUS
-// ========================================
-
-window.addEventListener(
-
-    "offline",
-
-    function() {
-
-        let warning =
-            document.createElement(
-                "div"
-            );
-
-        warning.className =
-            "network-warning";
-
-        warning.id =
-            "networkWarning";
-
-        warning.innerHTML =
-            `
-            ❌ No internet connection
-            `;
-
-        document.body.appendChild(
-            warning
-        );
-    }
-);
-
-window.addEventListener(
-
-    "online",
-
-    function() {
-
-        let warning =
-            document.getElementById(
-                "networkWarning"
-            );
-
-        if (warning) {
-
-            warning.remove();
         }
     }
 );
