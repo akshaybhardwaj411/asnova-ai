@@ -1,51 +1,88 @@
-// ========================================
-// SIDEBAR TOGGLE
-// ========================================
-
-const menuBtn =
-    document.getElementById("menuBtn");
-
-const sidebar =
-    document.getElementById("sidebar");
-
 // TOGGLE SIDEBAR
 
-menuBtn.addEventListener("click", () => {
+function toggleSidebar() {
 
-    sidebar.classList.toggle("active");
-});
+    document
+        .getElementById(
+            "sidebar"
+        )
+        .classList
+        .toggle("active");
+}
 
-// CLOSE WHEN CLICKING OUTSIDE
+// AUTO CLOSE SIDEBAR
+// AFTER CLICKING BUTTONS
 
-document.addEventListener("click", (e) => {
+document.addEventListener(
 
-    const clickedInsideSidebar =
-        sidebar.contains(e.target);
+    "click",
 
-    const clickedMenu =
-        menuBtn.contains(e.target);
+    function(event) {
 
-    if (
-        !clickedInsideSidebar &&
-        !clickedMenu
-    ) {
+        let sidebar =
+            document.getElementById(
+                "sidebar"
+            );
 
-        sidebar.classList.remove("active");
-    }
-});
+        let menuButton =
+            document.querySelector(
+                ".menu-toggle"
+            );
 
-// CLOSE AFTER CLICKING SIDEBAR BUTTON
+        // MOBILE ONLY
 
-const sidebarButtons =
-    sidebar.querySelectorAll("button");
+        if (
 
-sidebarButtons.forEach((btn) => {
+            window.innerWidth <= 900 &&
 
-    btn.addEventListener("click", () => {
+            !sidebar.contains(
+                event.target
+            ) &&
 
-        if (window.innerWidth < 900) {
+            !menuButton.contains(
+                event.target
+            )
 
-            sidebar.classList.remove("active");
+        ) {
+
+            sidebar.classList.remove(
+                "active"
+            );
         }
-    });
-});
+    }
+);
+
+// CLOSE SIDEBAR
+// AFTER CLICKING SIDEBAR BUTTON
+
+let sidebarButtons =
+    document.querySelectorAll(
+
+        ".sidebar button"
+    );
+
+sidebarButtons.forEach(
+
+    button => {
+
+        button.addEventListener(
+
+            "click",
+
+            () => {
+
+                if (
+                    window.innerWidth <= 900
+                ) {
+
+                    document
+                        .getElementById(
+                            "sidebar"
+                        )
+                        .classList
+                        .remove("active");
+                }
+            }
+        );
+    }
+);
