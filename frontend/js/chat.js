@@ -7,12 +7,6 @@ let currentChatId = null;
 let allChats = [];
 
 // ========================================
-// AI MEMORY
-// ========================================
-
-let conversationHistory = [];
-
-// ========================================
 // INITIALIZE
 // ========================================
 
@@ -93,14 +87,6 @@ function newChat() {
 
     currentChatId =
         Date.now();
-    // RESET MEMORY
-    conversationHistory = [
-        {
-            role: "system",
-            content:
-                "You are ASnova AI, a smart AI study assistant."
-        }
-    ];
 
     let chat = {
 
@@ -223,45 +209,6 @@ function openChat(id) {
         "chatBox"
     ).innerHTML =
         chat.messages.join("");
-
-    // RESET MEMORY
-    conversationHistory = [
-        {
-            role: "system",
-            content:
-                "You are ASnova AI, a smart AI study assistant."
-        }
-    ];
-    // REBUILD MEMORY
-    let wrappers =
-        document.querySelectorAll(
-            ".message-wrapper"
-        );
-    wrappers.forEach(wrapper => {
-        
-        let user =
-            wrapper.querySelector(
-                ".user-text"
-            );
-        let ai =
-            wrapper.querySelector(
-                ".ai-content"
-            );
-        if (user) {
-            conversationHistory.push({
-                role: "user",
-                content:
-                    user.innerText
-            });
-        }
-        if (ai) {
-            conversationHistory.push({
-                role: "assistant",
-                content:
-                    ai.innerText
-            });
-        }
-    });
 
     // WELCOME
 
@@ -707,12 +654,6 @@ async function askAI() {
         userMessage
     );
 
-    // SAVE USER MESSAGE
-    conversationHistory.push({
-        role: "user",
-        content: promptText
-    });
-    
     input.value = "";
 
     // AI MESSAGE
@@ -729,21 +670,11 @@ async function askAI() {
     updateCurrentChat();
 
     try {
-        
+
         let response =
             await fetch(
-                `${API_BASE_URL}/chat`,
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type":
-                            "application/json"
-                    },
-                    body: JSON.stringify({
-                        history:
-                            conversationHistory
-                    })
-                }
+
+                `${API_BASE_URL}/chat?prompt=${encodeURIComponent(promptText)}`
             );
 
         let data =
@@ -752,12 +683,6 @@ async function askAI() {
         let aiText =
             data.response ||
             data.error;
-
-        // SAVE AI RESPONSE
-        conversationHistory.push({
-            role: "assistant",
-            content: aiText
-        });
 
         streamResponse(
             aiMessage,
@@ -1268,79 +1193,6 @@ document.addEventListener(
 // AI IMAGE ANALYSIS
 // ========================================
 
-async function analyzeImage() {
-
-    let imageInput =
-        document.getElementById(
-            "imageFile"
-        );
-
-    let file =
-        imageInput.files[0];
-
-    if (!file) {
-
-        alert(
-            "Please upload an image first."
-        );
-
-        return;
-    }
-
-    // HIDE WELCOME
-
-    document.getElementById(
-        "welcomeScreen"
-    ).style.display =
-        "none";
-
-    let chatBox =
-        document.getElementById(
-            "chatBox"
-        );
-
-    // SHOW IMAGE
-
-    let reader =
-        new FileReader();
-
-    reader.onload =
-        async function(e) {
-
-            // USER MESSAGE
-
-            let userWrapper =
-                createMessageWrapper(
-                    "user-wrapper"
-                );
-
-            userWrapper.innerHTML =
-                `
-                <div class="avatar user-avatar">
-
-                    👤
-
-                </div>
-
-                <div class="message user">
-
-                    <img
-                        class="chat-upload-image"
-                        src="${e.target.result}"
-                        onclick="openImageModal('${e.target.result}')">
-
-                    <div class="image-analysis-label">
-
-                        Analyze this image
-
-                    </div>
-
-                </div>
-                `;
-
-            chatBox.appendChild(
-                userWrapper
-            );
 
             // AI MESSAGE
 
