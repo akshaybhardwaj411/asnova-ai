@@ -1,6 +1,15 @@
+// ========================================
 // TOGGLE SIDEBAR
+// ========================================
 
-function toggleSidebar() {
+function toggleSidebar(event) {
+
+    // PREVENT INSTANT CLOSE
+
+    if (event) {
+
+        event.stopPropagation();
+    }
 
     document
         .getElementById(
@@ -10,8 +19,9 @@ function toggleSidebar() {
         .toggle("active");
 }
 
+// ========================================
 // AUTO CLOSE SIDEBAR
-// AFTER CLICKING BUTTONS
+// ========================================
 
 document.addEventListener(
 
@@ -35,6 +45,10 @@ document.addEventListener(
 
             window.innerWidth <= 900 &&
 
+            sidebar.classList.contains(
+                "active"
+            ) &&
+
             !sidebar.contains(
                 event.target
             ) &&
@@ -52,8 +66,25 @@ document.addEventListener(
     }
 );
 
-// CLOSE SIDEBAR
-// AFTER CLICKING SIDEBAR BUTTON
+// ========================================
+// PREVENT CLOSE WHEN CLICKING INSIDE
+// ========================================
+
+document
+    .getElementById("sidebar")
+    .addEventListener(
+
+        "click",
+
+        function(event) {
+
+            event.stopPropagation();
+        }
+    );
+
+// ========================================
+// CLOSE AFTER SIDEBAR BUTTON CLICK
+// ========================================
 
 let sidebarButtons =
     document.querySelectorAll(
