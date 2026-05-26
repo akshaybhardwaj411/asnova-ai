@@ -1,6 +1,7 @@
 from fastapi import FastAPI, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from pydantic import BaseModel
 
 from dotenv import load_dotenv
 
@@ -74,56 +75,28 @@ def home():
 # =========================================
 # CHAT ROUTE
 # =========================================
+    class ChatRequest(BaseModel):
+        history: list
 
-@app.get("/chat")
 
-def chat(prompt: str):
+@app.post("/chat")
 
+def chat(data: ChatRequest):
     try:
-
+        
         response = client.chat.completions.create(
-
-            model=
-            "openai/gpt-3.5-turbo",
-
-            messages=[
-
-                {
-                    "role": "system",
-
-                    "content":
-                    """
-                    You are ASnova AI,
-                    a smart AI study assistant.
-
-                    Always:
-                    - explain clearly
-                    - use points
-                    - keep answers structured
-                    - help students learn easily
-                    """
-                },
-
-                {
-                    "role": "user",
-
-                    "content": prompt
-                }
-
-            ]
+            model="openai/gpt-3.5-turbo",
+            
+            messages=data.history
         )
-
+        
         return {
-
             "response":
             response.choices[0]
             .message.content
         }
-
     except Exception as e:
-
         return {
-
             "error": str(e)
         }
 
