@@ -7,6 +7,12 @@ let currentChatId = null;
 let allChats = [];
 
 // ========================================
+// AI MEMORY
+// ========================================
+
+let conversationHistory = [];
+
+// ========================================
 // INITIALIZE
 // ========================================
 
@@ -87,6 +93,14 @@ function newChat() {
 
     currentChatId =
         Date.now();
+    // RESET MEMORY
+    conversationHistory = [
+        {
+            role: "system",
+            content:
+                "You are ASnova AI, a smart AI study assistant."
+        }
+    ];
 
     let chat = {
 
@@ -209,6 +223,45 @@ function openChat(id) {
         "chatBox"
     ).innerHTML =
         chat.messages.join("");
+
+    // RESET MEMORY
+    conversationHistory = [
+        {
+            role: "system",
+            content:
+                "You are ASnova AI, a smart AI study assistant."
+        }
+    ];
+    // REBUILD MEMORY
+    let wrappers =
+        document.querySelectorAll(
+            ".message-wrapper"
+        );
+    wrappers.forEach(wrapper => {
+        
+        let user =
+            wrapper.querySelector(
+                ".user-text"
+            );
+        let ai =
+            wrapper.querySelector(
+                ".ai-content"
+            );
+        if (user) {
+            conversationHistory.push({
+                role: "user",
+                content:
+                    user.innerText
+            });
+        }
+        if (ai) {
+            conversationHistory.push({
+                role: "assistant",
+                content:
+                    ai.innerText
+            });
+        }
+    });
 
     // WELCOME
 
@@ -654,6 +707,12 @@ async function askAI() {
         userMessage
     );
 
+    // SAVE USER MESSAGE
+    conversationHistory.push({
+        role: "user",
+        content: promptText
+    });
+    
     input.value = "";
 
     // AI MESSAGE
@@ -670,11 +729,21 @@ async function askAI() {
     updateCurrentChat();
 
     try {
-
+        
         let response =
             await fetch(
-
-                `${API_BASE_URL}/chat?prompt=${encodeURIComponent(promptText)}`
+                `${API_BASE_URL}/chat`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+                    body: JSON.stringify({
+                        history:
+                            conversationHistory
+                    })
+                }
             );
 
         let data =
@@ -683,6 +752,12 @@ async function askAI() {
         let aiText =
             data.response ||
             data.error;
+
+        // SAVE AI RESPONSE
+        conversationHistory.push({
+            role: "assistant",
+            content: aiText
+        });
 
         streamResponse(
             aiMessage,
