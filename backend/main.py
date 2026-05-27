@@ -7,7 +7,7 @@ from fastapi import UploadFile
 from fastapi import File
 from fastapi.middleware.cors import CORSMiddleware
 
-from PyPDF2 import PdfReader
+#from PyPDF2 import PdfReader
 
 from openai import OpenAI
 
